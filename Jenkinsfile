@@ -18,7 +18,7 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 sh """
-                DOCKER_BUILDKIT=1 docker build -t $DOCKER_IMAGE .
+                sudo docker build -t $DOCKER_IMAGE .
                 """
             }
         }
