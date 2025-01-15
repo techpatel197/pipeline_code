@@ -18,7 +18,8 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 sh """
-                sudo docker build -t $DOCKER_IMAGE .
+                cd node_project
+                docker build -t $DOCKER_IMAGE .
                 """
             }
         }
