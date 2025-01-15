@@ -1,10 +1,6 @@
 pipeline {
     agent { label 'ec2-agent-label' } // Replace with your EC2 agent's label
 
-    environment {
-        DOCKER_IMAGE = "your-docker-image-name" // Replace with your Docker image name
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
@@ -18,7 +14,7 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 sh """
-                docker build -t $DOCKER_IMAGE .
+                docker build -t Node-app .
                 """
             }
         }
@@ -27,12 +23,8 @@ pipeline {
             steps {
                 echo 'Deploying on EC2 agent...'
                 sh """
-                # Stop and remove any existing container
-                docker stop your-container-name || true
-                docker rm your-container-name || true
-                
                 # Run the new Docker container
-                docker run -d --name your-container-name -p 3000:3000 $DOCKER_IMAGE
+                docker run -d --name Node-container -p 8000:8000 Node-app
                 """
                 // Replace `your-container-name` and port mappings as necessary
             }
