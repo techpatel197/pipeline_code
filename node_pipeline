@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'ec2-agent-label' } // Replace with your EC2 agent's label
+    agent { label 'ec2-agent' } // Replace with your EC2 agent's label
 
     stages {
         stage('Clone Repository') {
