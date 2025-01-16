@@ -2,7 +2,9 @@ pipeline {
     agent { label 'ec2-agent' } // Replace with your EC2 agent's label
 
     environment {
-        DOCKER_IMAGE = 'node-app' // Replace with your desired image name
+        APP_PORT = "8000" // Replace with your application port
+        CONTAINER_NAME = "nodejs_app" // Replace with your container name
+        IMAGE_NAME = 'node-app' // Replace with your desired image name
     }
 
     stages {
@@ -16,22 +18,36 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Building Docker image...'
-                sh """
-                cd node_project
-                docker build -t $DOCKER_IMAGE .
-                """
+                script {
+                    // Remove any running container using the specified port
+                    sh """
+                    docker ps --filter "name=$CONTAINER_NAME" -q | xargs -r docker stop
+                    docker ps --filter "name=$CONTAINER_NAME" -q | xargs -r docker rm
+                    """
+
+                    // Remove old images if necessary
+                    sh """
+                    docker images --filter "reference=$IMAGE_NAME" -q | xargs -r docker rmi -f
+                    """
+
+                    // Build a new Docker image
+                    sh """
+                    cd node_project
+                    docker build -t $IMAGE_NAME .
+                    """
+                }
             }
         }
 
         stage('Deploy to EC2 Agent') {
             steps {
                 echo 'Deploying on EC2 agent...'
-                sh """
-                # Run the new Docker container
-                docker run -d --name Node-container -p 8000:8000 $DOCKER_IMAGE
-                """
-                // Replace `your-container-name` and port mappings as necessary
+                script {
+                    // Run the container
+                    sh """
+                    docker run -d --name $CONTAINER_NAME -p $APP_PORT:$APP_PORT $IMAGE_NAME
+                    """
+                }
             }
         }
     }
